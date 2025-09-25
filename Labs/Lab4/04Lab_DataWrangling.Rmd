@@ -31,7 +31,7 @@ here()
 
 #Read in the data
 NTL.phys.data <- read.csv(
-  file=here("Data/Raw/NTL-LTER_Lake_ChemistryPhysics_Raw.csv"), 
+  file=here("./Data/Raw/NTL-LTER_Lake_ChemistryPhysics_Raw.csv"), 
   stringsAsFactors = TRUE
 )
 
@@ -80,16 +80,18 @@ NTL.phys.data.JunethruOctober <- filter(NTL.phys.data, daynum %in% c(152:304))
 # Exercise 1: 
 # filter NTL.phys.data for the year 1999
 # what code do you need to use, based on the class of the variable?
-
+class(NTL.phys.data$year4)
+NTL.phys.data.1999 <- filter(NTL.phys.data, NTL.phys.data$year4 == '1999')
 
 # Exercise 2: 
 # filter NTL.phys.data for Tuesday Lake from 1990 through 1999.
 
+NTL.phys.data.TuesdayLake.1990to1999 <- filter(NTL.phys.data, NTL.phys.data$lakename == 'Tuesday Lake' & NTL.phys.data$year4 >= '1990' & NTL.phys.data$year4 <= '1999') 
 
 ```
 Question: Why don't we filter using row numbers?
 
-> Answer: 
+> Answer: Bc it's silly, row numbers can change as you move data around. Filtering by attributes is smarter and more fullproof
 
 ---
 
@@ -104,21 +106,29 @@ Let's say we want to take our raw dataset (NTL.phys.data), *then* filter the dat
 #Example using pipes to wrangle data: 
 #Add pipes in the correct place below
 NTL.phys.data.processed <- 
-  NTL.phys.data
-  filter(lakename == "Paul Lake" | lakename == "Peter Lake") 
-  select(lakename, sampledate:temperature_C) 
+  NTL.phys.data %>% 
+  filter(lakename == "Paul Lake" | lakename == "Peter Lake") %>% 
+  select(lakename, sampledate:temperature_C) %>% 
   mutate(temperature_F = (temperature_C*9/5) + 32)
 
 #Exercise 3: Using a pipe filter NTL.phys.data for Tuesday Lake from 1990 
 # through 1999 only for July.
 
-  
+Piped.NTL.phys.data.TuesdayLake.1990to1999.July <- 
+  NTL.phys.data %>% 
+  filter(lakename == 'Tuesday Lake' & year4 >= '1990' & year4 <= '1999') %>% 
+  filter(month(sampledate) == 7)
 
 #Exercise 4: Using the data from part 3, a pipe, and the summarize() function, 
 # find the mean surface water temperature. 
 # (hint: you will need to filter for depth==0). 
 
+NTL.phys.data.TuesdayLake.1990to1999.meantemp <- 
+  Piped.NTL.phys.data.TuesdayLake.1990to1999.July %>% 
+  filter(depth == 0) %>% 
+  summarize(mean_temp = mean(temperature_C, na.rm = TRUE)) 
   
+ 
 ```
 
 
@@ -133,7 +143,9 @@ For gather we will use `pivot_longer` and for spread we will use `pivot_wider`.
 #  the new column holding the irradiance type as "Irradiance_Type", and name the
 #  new column holding the irradiance values as "Irradiance_Value".
 
-
+NTL.phys.data.collapsedirradiance <- 
+  pivot_longer(NTL.phys.data, irradianceWater:irradianceDeck, names_to = 'Irradiance_Type',
+               values_to = 'Irradiance_Value')
 
 #Exercise 6: Spread temperatureC into more than one column based on the depth.
 
