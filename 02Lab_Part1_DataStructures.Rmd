@@ -62,7 +62,7 @@ max(vector1)
 
 #Create another vector of the values 10 thru 15
 vector4 <- c(10:15)
-
+??seq()
 #c stands for collection. It combines the two vectors into a collection!
 c(vector1, vector4)
 
