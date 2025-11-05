@@ -145,7 +145,7 @@ GaringerOzone$Daily.Max.8.hour.Ozone.Concentration =
 GaringerOzone.monthly <- GaringerOzone %>% 
   mutate(Month = month(Date)) %>% 
   mutate(Year = year(Date)) %>% 
-  group_by(Month, Year) %>% 
+  group_by(Year, Month) %>% 
   summarize(mean_ozone = mean(Daily.Max.8.hour.Ozone.Concentration))
 
 #Making new column for graphing purposes
@@ -211,7 +211,7 @@ ggplot(GaringerOzone.monthly, aes(x = MonthYear, y = mean_ozone)) +
 
 14. To accompany your graph, summarize your results in context of the research question. Include output from the statistical test in parentheses at the end of your sentence. Feel free to use multiple sentences in your interpretation.
 
-> Answer: We want to assess if we see a monotonic trend--a gradual shift over time--in our monthly average ozone concentrations over the period of 2010 to 2019. Has monthly mean ozone concentrations changed over time? Although we see a slight negative trend in our plotted data, to prove the null hypothesis that there is no monotonic trend wrong, we need to incorporate seasonal fluctuation in our test. Running a seasonal Mann-Kendall test to assess gradual change in ozone concentrations, our p-values are a bit large (with our 2-sided pvalue being =0.163). Although there seems to be a negative trend in ozone concentrations over time, we cannot rule out the null hyopthesis from this test.
+> Answer: We want to assess if we see a monotonic trend--a gradual shift over time--in our monthly average ozone concentrations over the period of 2010 to 2019. Has monthly mean ozone concentrations changed over time? Although we see a slight negative trend in our plotted data, to prove the null hypothesis that there is no monotonic trend wrong, we need to incorporate seasonal fluctuation in our test. Running a seasonal Mann-Kendall test to assess gradual change in ozone concentrations, our p-value is significant (with our 2-sided pvalue being =0.046724). There seems to be a negative trend in ozone concentrations over time, and it seems we can rule out the null hypothesis that there is no change in mean ozone concentrations over time!
 
 15. Subtract the seasonal component from the `GaringerOzone.monthly.ts`. Hint: Look at how we extracted the series components for the EnoDischarge on the lesson Rmd file.
 
@@ -220,6 +220,7 @@ ggplot(GaringerOzone.monthly, aes(x = MonthYear, y = mean_ozone)) +
 ```{r}
 #15: subtracting seasonal component from our ts object
 GaringerOzone.monthly.nonseas <- (GaringerOzone.monthly.ts - GaringerOzone.monthly.decomposed$time.series[,1])
+
 
 #making sure it worked
 plot(GaringerOzone.monthly.decomposed)
@@ -233,4 +234,4 @@ GaringerOzone.monthly.nonseas.trend
 
 ```
 
-> Answer: After running the Mann Kendall test on the non-seasonal data, there is still no significant trend that can disprove the null hypothesis (p-value = 0.1039). Although it is a smaller p-value than our seasonal test (two-sided p-value = 0.163), it is still greater than alpha. Therefore, we cannot conclude that monthly ozone averages have gradually changed over time.
+> Answer: After running the Mann Kendall test on the non-seasonal data, there is still a significant trend that can disprove the null hypothesis (p-value = 0.00754)! It is also a smaller p-value than our seasonal test (two-sided p-value = 0.047), meaning that subtracting the seasonal noise better explains our relationship with ozone over time. Therefore, we can conclude that monthly ozone averages have gradually changed over time, through a slightly negative monotonic trend.
